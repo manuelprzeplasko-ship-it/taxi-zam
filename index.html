@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>PIKER TAXI – Zamów / Rezerwacja</title>
+<title>PIKER TAXI – Zamów kurs</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -71,10 +71,10 @@ button {
 
 <div class="logo">
     <img src="piker.jpg" alt="PIKER TAXI">
-    <div style="font-size:26px; font-weight:bold;">PIKER TAXI</div>
+    <div style="font-size:26px; font-weight:bold;">PIKER TAXI – ZAMÓW KURS</div>
 </div>
 
-<h2>Zamów lub zarezerwuj kurs</h2>
+<h2>Zamów kurs</h2>
 
 <div class="container">
 
@@ -106,7 +106,6 @@ button {
     <div id="price" class="priceBox"></div>
 
     <button onclick="order()">ZAMÓW KURS</button>
-    <button onclick="reserve()">REZERWACJA</button>
 
     <div id="map"></div>
 
@@ -156,14 +155,6 @@ function calculateRoute() {
 }
 
 function order() {
-    sendSMS("Zamawiam kurs");
-}
-
-function reserve() {
-    sendSMS("Rezerwacja kursu");
-}
-
-function sendSMS(type) {
     const from = document.getElementById("from").value;
     const to = document.getElementById("to").value;
     const phone = document.getElementById("phone").value;
@@ -175,14 +166,17 @@ function sendSMS(type) {
     if (tariff == 3) tariffName = "Taryfa 3 (Niedziele/Święta)";
     if (tariff == 4) tariffName = "BMW Premium";
 
-    const sms = `sms:788031572?body=${type}: ${from} → ${to}. Tel klienta: ${phone}. Dystans: ${distanceKm.toFixed(2)} km. ${tariffName}. Cena (orientacyjna): ${document.getElementById("price").innerText}`;
+    const sms = `sms:788031572?body=Zamawiam kurs: ${from} → ${to}. 
+Tel klienta: ${phone}. 
+Dystans: ${distanceKm.toFixed(2)} km. 
+${tariffName}. 
+Cena (orientacyjna): ${document.getElementById("price").innerText}`;
 
     window.location.href = sms;
 }
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo7fxKQB3dTjyyn0sn5M4wOOIz0KDboYw
-"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo7fxKQB3dTjyyn0sn5M4wOOIz0KDboYw"></script>
 
 </body>
 </html>
