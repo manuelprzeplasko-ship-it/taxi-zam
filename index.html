@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>PIKER TAXI – Zamów / Rezerwacja</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    font-family: Arial;
+    background: #000;
+    color: #f1c40f;
+    margin: 0;
+    padding: 20px;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.container {
+    background: #111;
+    padding: 20px;
+    border-radius: 10px;
+}
+label {
+    font-size: 18px;
+    margin-bottom: 10px;
+    display: block;
+}
+input, select {
+    background: #222;
+    color: #f1c40f;
+    padding: 12px;
+    border-radius: 6px;
+    width: 100%;
+    margin-bottom: 20px;
+    border: none;
+}
+button {
+    width: 100%;
+    padding: 14px;
+    background: #f1c40f;
+    color: #000;
+    font-weight: bold;
+    border-radius: 6px;
+    font-size: 20px;
+    margin-top: 10px;
+    border: none;
+}
+.logo {
+    text-align:center;
+    margin-bottom:25px;
+}
+.logo img {
+    width:180px;
+}
+#map {
+    width: 100%;
+    height: 300px;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+.priceBox {
+    font-size: 22px;
+    margin-top: 10px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="logo">
+    <img src="piker.jpg" alt="PIKER TAXI">
+    <div style="font-size:26px; font-weight:bold;">PIKER TAXI</div>
+</div>
+
+<h2>Zamów lub zarezerwuj kurs</h2>
+
+<div class="container">
+
+    <label>Skąd:</label>
+    <input id="from" type="text" placeholder="np. Legnica">
+
+    <label>Dokąd:</label>
+    <input id="to" type="text" placeholder="np. Wrocław">
+
+    <label>Numer telefonu klienta:</label>
+    <input id="phone" type="tel" placeholder="np. 600123456">
+
+    <label><b>Taryfy:</b><br>
+    Taryfa 1 – 6-22<br>
+    Taryfa 2 – 22-6<br>
+    Taryfa 3 – Niedziele i Święta<br>
+    Taryfa 4 – BMW Premium
+    </label>
+
+    <select id="tariff">
+        <option value="1">Taryfa 1 (4 zł/km + 8 zł)</option>
+        <option value="2">Taryfa 2 (5 zł/km + 8 zł)</option>
+        <option value="3">Taryfa 3 (5 zł/km + 8 zł)</option>
+        <option value="4">Taryfa 4 BMW Premium (6 zł/km + 30 zł)</option>
+    </select>
+
+    <button onclick="calculateRoute()">OBLICZ KURS</button>
+
+    <div id="price" class="priceBox"></div>
+
+    <button onclick="order()">ZAMÓW KURS</button>
+    <button onclick="reserve()">REZERWACJA</button>
+
+    <div id="map"></div>
+
+</div>
+
+<script>
+let distanceKm = 0;
+
+function calculateRoute() {
+    const from = document.getElementById("from").value;
+    const to = document.getElementById("to").value;
+
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer();
+
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 7,
+        center: { lat: 51.1, lng: 17.0 }
+    });
+
+    directionsRenderer.setMap(map);
+
+    directionsService.route({
+        origin: from,
+        destination: to,
+        travelMode: google.maps.TravelMode.DRIVING
+    }, function(result, status) {
+        if (status === "OK") {
+            directionsRenderer.setDirections(result);
+
+            const route = result.routes[0].legs[0];
+            distanceKm = route.distance.value / 1000;
+
+            const tariff = document.getElementById("tariff").value;
+
+            let price = 0;
+
+            if (tariff == 1) price = distanceKm * 4 + 8;
+            if (tariff == 2) price = distanceKm * 5 + 8;
+            if (tariff == 3) price = distanceKm * 5 + 8;
+            if (tariff == 4) price = distanceKm * 6 + 30;
+
+            document.getElementById("price").innerHTML =
+                "Cena: " + price.toFixed(2) + " zł (Orientacyjna)";
+        }
+    });
+}
+
+function order() {
+    sendSMS("Zamawiam kurs");
+}
+
+function reserve() {
+    sendSMS("Rezerwacja kursu");
+}
+
+function sendSMS(type) {
+    const from = document.getElementById("from").value;
+    const to = document.getElementById("to").value;
+    const phone = document.getElementById("phone").value;
+    const tariff = document.getElementById("tariff").value;
+
+    let tariffName = "";
+    if (tariff == 1) tariffName = "Taryfa 1 (6-22)";
+    if (tariff == 2) tariffName = "Taryfa 2 (22-6)";
+    if (tariff == 3) tariffName = "Taryfa 3 (Niedziele/Święta)";
+    if (tariff == 4) tariffName = "BMW Premium";
+
+    const sms = `sms:788031572?body=${type}: ${from} → ${to}. Tel klienta: ${phone}. Dystans: ${distanceKm.toFixed(2)} km. ${tariffName}. Cena (orientacyjna): ${document.getElementById("price").innerText}`;
+
+    window.location.href = sms;
+}
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBo7fxKQB3dTjyyn0sn5M4wOOIz0KDboYw
+"></script>
+
+</body>
+</html>
